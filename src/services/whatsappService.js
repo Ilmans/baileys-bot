@@ -7,22 +7,30 @@ const {
   DisconnectReason,
   getContentType,
 } = require("@whiskeysockets/baileys");
+
 const { Boom } = require("@hapi/boom");
 const MAIN_LOGGER = require("../lib/pino");
 const { getMediaMessage } = require("../lib/helper");
 const logger = MAIN_LOGGER.child({ module: "whatsapp" });
+const fs = require("fs");
+const Long = require("long");
+
 class WhatsappService {
+
   constructor(NodeCache) {
     this.instanceQr = {
       count: 0,
       qr: "",
     };
-
     this.nodeCache = NodeCache;
   }
 
   async defineAuthState() {
     return await useMultiFileAuthState("./auth");
+  }
+
+  async clearAuthState() {
+    await fs.promises.rmdir("./auth", { recursive: true });
   }
 
   async setSocket() {
@@ -77,13 +85,16 @@ class WhatsappService {
       const shouldReconnect =
         (lastDisconnect?.error instanceof Boom)?.output?.statusCode !==
         DisconnectReason.loggedOut;
+      const ErrorType = lastDisconnect.error?.output?.payload?.error;
       if (shouldReconnect) {
+        if (
+          ErrorType === "Unauthorized" ||
+          ErrorType === "Method Not Allowed"
+        ) {
+          this.client?.logout();
+        }
         await this.connectToWhatsapp();
       } else {
-        this.sendDataWebhook("statusInstance", {
-          instance: this.instance.name,
-          status: "removed",
-        });
         this.client?.ws?.close();
         this.client.end(new Error("Close connection"));
       }
@@ -110,16 +121,14 @@ class WhatsappService {
 
       if (events["messages.upsert"]) {
         const payload = events["messages.upsert"];
-        //  this.messageHandle["messages.upsert"](payload);
+        this.messageHandle["messages.upsert"](payload);
       }
     });
   }
 
   messageHandle = {
     "messages.upsert": async ({ messages, type }) => {
-      console.log(messages);
       for (const received of messages) {
-        console.log(received);
         if (
           type !== "notify" ||
           !received?.message ||
@@ -128,14 +137,13 @@ class WhatsappService {
         ) {
           return;
         }
-        console.log("jere");
+
         this.client.sendPresenceUpdate("unavailable");
         if (Long.isLong(received.messageTimestamp)) {
           received.messageTimestamp = received.messageTimestamp?.toNumber();
         }
 
         const messageRaw = await getMediaMessage(received);
-        console.log(messageRaw);
       }
     },
   };
