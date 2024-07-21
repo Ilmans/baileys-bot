@@ -16,7 +16,6 @@ const fs = require("fs");
 const Long = require("long");
 
 class WhatsappService {
-
   constructor(NodeCache) {
     this.instanceQr = {
       count: 0,
@@ -91,7 +90,7 @@ class WhatsappService {
           ErrorType === "Unauthorized" ||
           ErrorType === "Method Not Allowed"
         ) {
-          this.client?.logout();
+          await this.clearAuthState();
         }
         await this.connectToWhatsapp();
       } else {
