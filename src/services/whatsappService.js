@@ -5,7 +5,7 @@ const {
   default: makeWASocket,
   Browsers,
   DisconnectReason,
-  getContentType,
+  prepareWAMessageMedia,
 } = require("@whiskeysockets/baileys");
 
 const { Boom } = require("@hapi/boom");
@@ -14,14 +14,16 @@ const { getMediaMessage } = require("../lib/helper");
 const logger = MAIN_LOGGER.child({ module: "whatsapp" });
 const fs = require("fs");
 const Long = require("long");
+const { default: axios } = require("axios");
 
 class WhatsappService {
-  constructor(NodeCache) {
+  constructor(NodeCache, messageHandler) {
     this.instanceQr = {
       count: 0,
       qr: "",
     };
     this.nodeCache = NodeCache;
+    this.messageHandler = messageHandler;
   }
 
   async defineAuthState() {
@@ -127,6 +129,7 @@ class WhatsappService {
 
   messageHandle = {
     "messages.upsert": async ({ messages, type }) => {
+      let quoted = false;
       for (const received of messages) {
         if (
           type !== "notify" ||
@@ -143,10 +146,117 @@ class WhatsappService {
         }
 
         const messageRaw = await getMediaMessage(received);
-        console.log(messageRaw);
+        try {
+          const result = await this.messageHandler.process(messageRaw);
+          let reply =
+            typeof result === "string" ? result : JSON.stringify(result);
+          reply = reply.replace(/{name}/g, messageRaw.name);
+          reply = JSON.parse(reply);
+
+          // if respon webhook expecting to send media
+          if ("type" in reply) {
+            let ownerJid = this.client.user.id.replace(/:\d+/, "");
+            if (reply.type == "audio") {
+              return await this.client.sendMessage(messages.key.remoteJid, {
+                audio: { url: reply.url },
+                ptt: true,
+                mimetype: "audio/mpeg",
+              });
+            }
+            // for send media ( document/video or image)
+            const generate = await this.prepareMediaMessage({
+              caption: reply.caption ? reply.caption : "",
+              fileName: reply.filename,
+              media: reply.url,
+              mediatype:
+                reply.type !== "video" && reply.type !== "image"
+                  ? "document"
+                  : reply.type,
+            });
+
+            const message = { ...generate.message };
+
+            return await sock.sendMessage(
+              msg.key.remoteJid,
+              {
+                forward: {
+                  key: { remoteJid: ownerJid, fromMe: true },
+                  message: message,
+                },
+              },
+              {
+                quoted: quoted ? msg : null,
+              }
+            );
+
+            //SEND TEXT MESSAGE
+          } else {
+            await this.client
+              .sendMessage(received.key.remoteJid, reply, {
+                quoted: quoted ? messages : null,
+              })
+              .catch((e) => {
+                console.log("error send message", e);
+              });
+          }
+        } catch (error) {
+          console.log(error);
+        }
       }
     },
   };
+
+  async prepareMediaMessage(mediaMessage) {
+    try {
+      const prepareMedia = await prepareWAMessageMedia(
+        {
+          [mediaMessage.mediatype]: { url: mediaMessage.media },
+        },
+        {
+          upload: this.client.waUploadToServer,
+        }
+      );
+
+      const mediaType = mediaMessage.mediatype + "Message";
+      if (mediaMessage.mediatype === "document" && !mediaMessage.fileName) {
+        const regex = new RegExp(/.*\/(.+?)\./);
+        const arrayMatch = regex.exec(mediaMessage.media);
+        mediaMessage.fileName = arrayMatch[1];
+      }
+      mimetype = mime.lookup(mediaMessage.media);
+      if (!mimetype) {
+        const head = await axios.head(mediaMessage.media);
+        mimetype = head.headers["content-type"];
+      }
+
+      if (mediaMessage.media.includes(".cdr")) {
+        mimetype = "application/cdr";
+      }
+
+      prepareMedia[mediaType].caption = mediaMessage?.caption;
+      prepareMedia[mediaType].mimetype = mimetype;
+      prepareMedia[mediaType].fileName = mediaMessage.fileName;
+
+      if (mediaMessage.mediatype === "video") {
+        prepareMedia[mediaType].jpegThumbnail = Uint8Array.from(
+          fs.readFileSync(
+            join(process.cwd(), "public", "images", "video-cover.png")
+          )
+        );
+        prepareMedia[mediaType].gifPlayback = false;
+      }
+
+      let ownerJid = this.client.user.id.replace(/:\d+/, "");
+      return await generateWAMessageFromContent(
+        "",
+        { [mediaType]: { ...prepareMedia[mediaType] } },
+        { userJid: ownerJid }
+      );
+    } catch (error) {
+      console.log("error prepare", error);
+      return false;
+    }
+  }
 }
 
 module.exports = WhatsappService;

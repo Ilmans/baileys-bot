@@ -2,11 +2,12 @@
 const express = require("express");
 const WhatsappService = require("./services/whatsappService");
 const nodecache = require("node-cache");
+const MessageHandler = require("./services/messageHandler");
 
 const app = express();
 
-const whatsapp = new WhatsappService();
-
+const messageHandler = new MessageHandler();
+const whatsapp = new WhatsappService(null, messageHandler);
 
 const NodeCache = new nodecache();
 
@@ -17,4 +18,3 @@ const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
-
