@@ -1,8 +1,12 @@
+const ResponFormatter = require("../lib/responFormatter");
+
 class MessageHandler {
+    
+  constructor() {
+    this.responFormatter = new ResponFormatter();
+  }
   async process({ name, from, groupId, text, file, location }) {
-    return {
-      text: "Hello World!",
-    };
+    return this.responFormatter.line("Hello World").responAsText();
   }
 }
 
