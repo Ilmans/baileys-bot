@@ -143,6 +143,7 @@ class WhatsappService {
         }
 
         const messageRaw = await getMediaMessage(received);
+        console.log(messageRaw);
       }
     },
   };

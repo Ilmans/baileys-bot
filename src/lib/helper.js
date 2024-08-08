@@ -1,5 +1,6 @@
 const { downloadMediaMessage, isJidGroup } = require("@whiskeysockets/baileys");
 const mime = require("mime-types");
+const { P } = require("pino");
 async function getMediaMessage(m, inner = false) {
   const TypeMediaMessage = [
     "conversation",
@@ -44,7 +45,7 @@ async function getMediaMessage(m, inner = false) {
         "buffer",
         {},
         {
-          logger: P({ level: "silent" }),
+          logger: { level: "silent" },
           //  reuploadRequest: this.client.updateMediaMessage,
         }
       );
