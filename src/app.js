@@ -3,7 +3,7 @@ const express = require("express");
 const WhatsappService = require("./services/whatsappService");
 const nodecache = require("node-cache");
 const MessageHandler = require("./services/messageHandler");
-
+require("dotenv").config();
 const app = express();
 
 const messageHandler = new MessageHandler();
@@ -13,7 +13,7 @@ const NodeCache = new nodecache();
 
 whatsapp.connectToWhatsapp(NodeCache);
 // Start the server
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

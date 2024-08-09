@@ -33,6 +33,7 @@ class MessageHandler {
 
     if (!isRegistered) return;
 
+    //handle sticker command
     if (text === this.commands.sticker) {
       if (!file)
         return this.responFormatter
@@ -40,6 +41,8 @@ class MessageHandler {
           .responAsText();
       return this.responFormatter.responSticker(await StickerWa.create(file));
     }
+
+    //handle ai
   }
 }
 
