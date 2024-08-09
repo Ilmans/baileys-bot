@@ -6,6 +6,7 @@ const {
   Browsers,
   DisconnectReason,
   prepareWAMessageMedia,
+  generateWAMessageFromContent,
 } = require("@whiskeysockets/baileys");
 
 const { Boom } = require("@hapi/boom");
@@ -15,6 +16,7 @@ const logger = MAIN_LOGGER.child({ module: "whatsapp" });
 const fs = require("fs");
 const Long = require("long");
 const { default: axios } = require("axios");
+const mime = require("mime-types");
 
 class WhatsappService {
   constructor(NodeCache, messageHandler) {
@@ -141,6 +143,7 @@ class WhatsappService {
         }
 
         this.client.sendPresenceUpdate("unavailable");
+
         if (Long.isLong(received.messageTimestamp)) {
           received.messageTimestamp = received.messageTimestamp?.toNumber();
         }
@@ -154,6 +157,7 @@ class WhatsappService {
           reply = JSON.parse(reply);
 
           // if respon webhook expecting to send media
+
           if ("type" in reply) {
             let ownerJid = this.client.user.id.replace(/:\d+/, "");
             if (reply.type == "audio") {
@@ -176,8 +180,8 @@ class WhatsappService {
 
             const message = { ...generate.message };
 
-            return await sock.sendMessage(
-              msg.key.remoteJid,
+            const k = await this.client.sendMessage(
+              received.key.remoteJid,
               {
                 forward: {
                   key: { remoteJid: ownerJid, fromMe: true },
@@ -185,19 +189,16 @@ class WhatsappService {
                 },
               },
               {
-                quoted: quoted ? msg : null,
+                quoted: quoted ? messages : null,
               }
             );
+            console.log("kkk", k);
 
             //SEND TEXT MESSAGE
           } else {
-            await this.client
-              .sendMessage(received.key.remoteJid, reply, {
-                quoted: quoted ? messages : null,
-              })
-              .catch((e) => {
-                console.log("error send message", e);
-              });
+            await this.client.sendMessage(received.key.remoteJid, reply, {
+              quoted: quoted ? messages : null,
+            });
           }
         } catch (error) {
           console.log(error);
@@ -223,7 +224,7 @@ class WhatsappService {
         const arrayMatch = regex.exec(mediaMessage.media);
         mediaMessage.fileName = arrayMatch[1];
       }
-      mimetype = mime.lookup(mediaMessage.media);
+      let mimetype = mime.lookup(mediaMessage.media);
       if (!mimetype) {
         const head = await axios.head(mediaMessage.media);
         mimetype = head.headers["content-type"];

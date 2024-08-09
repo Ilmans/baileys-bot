@@ -28,10 +28,10 @@ class ResponFormatter {
     return this;
   }
 
-  image(url = null) {
-    this.image = { url: url };
-    return this;
-  }
+//   addImage(url = null) {
+//     this.image = { url: url };
+//     return this;
+//   }
 
   convertLines() {
     return this.lines.join("\n");
