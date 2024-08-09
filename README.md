@@ -3,7 +3,8 @@
 Welcome to the WhatsApp AI Bot project! This bot leverages the power of Gemini AI and OpenAI to bring smart, responsive AI capabilities directly to your WhatsApp chats. Whether you want to create stickers or have a conversation with AI, this bot has got you covered!
 
 This project is built using the following whatsapp tools:
-- **WhatsApp Tools**: [@WhiskeySockets/baileys](https://github.com/WhiskeySockets/Baileys)
+
+- **WhatsApp Core**: [@WhiskeySockets/baileys](https://github.com/WhiskeySockets/Baileys)
 
 ## Features
 
