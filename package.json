@@ -18,6 +18,7 @@
     "mime-types": "^2.1.35",
     "node-cache": "^5.1.2",
     "pino": "^9.3.1",
-    "pino-pretty": "^11.2.1"
+    "pino-pretty": "^11.2.1",
+    "wa-sticker-formatter": "^4.4.4"
   }
 }

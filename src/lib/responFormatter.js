@@ -6,6 +6,13 @@ class ResponFormatter {
     this.image = null;
   }
 
+  reset = () => {
+    this.lines = [];
+    this.footer = "";
+    this.quoted = false;
+    this.image = null;
+  };
+
   // new line
   line(text = "") {
     this.lines.push(text);
@@ -28,10 +35,10 @@ class ResponFormatter {
     return this;
   }
 
-//   addImage(url = null) {
-//     this.image = { url: url };
-//     return this;
-//   }
+  //   addImage(url = null) {
+  //     this.image = { url: url };
+  //     return this;
+  //   }
 
   convertLines() {
     return this.lines.join("\n");
@@ -43,19 +50,23 @@ class ResponFormatter {
   }
 
   responAsText() {
-    return JSON.stringify({
+    const js = JSON.stringify({
       text: this.convertLines(),
       quoted: this.quoted,
     });
+    this.reset();
+    return js;
   }
 
   responAsMedia(url = "", type = "image", filename = null) {
-    return JSON.stringify({
+    const js = JSON.stringify({
       type: type, // image, video, document, or audio
       url: url,
       filename: filename, // optional
       caption: this.convertLines(),
     });
+    this.reset();
+    return;
   }
 
   responAsAudio(url = "", ptt = true) {
@@ -65,6 +76,7 @@ class ResponFormatter {
       mimetype: "audio/mpeg",
       caption: this.convertLines(),
     };
+    this.reset();
     return JSON.stringify(message);
   }
 }
