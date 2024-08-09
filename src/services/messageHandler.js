@@ -1,5 +1,4 @@
 const GeminiAi = require("../external/geminiAi");
-const InstagramVideoDownloader = require("../external/igDownloader");
 const OpenAiLocal = require("../external/openAi");
 const StickerWa = require("../external/stickerWa");
 const ResponFormatter = require("../lib/responFormatter");
