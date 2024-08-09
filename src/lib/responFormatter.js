@@ -79,6 +79,14 @@ class ResponFormatter {
     this.reset();
     return JSON.stringify(message);
   }
+
+  responSticker(url) {
+    const message = {
+      sticker: { url: url },
+    };
+    this.reset();
+    return JSON.stringify(message);
+  }
 }
 
 module.exports = ResponFormatter;

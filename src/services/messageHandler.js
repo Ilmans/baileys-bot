@@ -1,3 +1,4 @@
+const StickerWa = require("../external/stickerWa");
 const ResponFormatter = require("../lib/responFormatter");
 const SenderManager = require("./senderManager");
 
@@ -7,7 +8,7 @@ class MessageHandler {
     this.senderManager = new SenderManager();
     this.commands = {
       start: "/start",
-    stop: "/stop",
+      stop: "/stop",
       help: "/help",
       sticker: "/sticker",
     };
@@ -33,17 +34,12 @@ class MessageHandler {
     if (!isRegistered) return;
 
     if (text === this.commands.sticker) {
-      return this.createSticker(file);
+      if (!file)
+        return this.responFormatter
+          .line("Please send image if using command /sticker")
+          .responAsText();
+      return this.responFormatter.responSticker(await StickerWa.create(file));
     }
-  }
-
-  async createSticker(file) {
-    if (!file)
-      return this.responFormatter
-        .line("Please send image if using command /sticker")
-        .responAsText();
-    //create sticker from image
-    console.log(file);
   }
 }
 
