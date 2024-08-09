@@ -1,6 +1,9 @@
 const { downloadMediaMessage, isJidGroup } = require("@whiskeysockets/baileys");
+const { text } = require("body-parser");
 const mime = require("mime-types");
-const { P } = require("pino");
+const Caching = require("node-cache");
+const cache = new Caching();
+
 async function getMediaMessage(m, inner = false) {
   const TypeMediaMessage = [
     "conversation",
@@ -74,7 +77,24 @@ async function getMediaMessage(m, inner = false) {
   }
 }
 
+const manageMessagesCache = (number, role, content, isGemini = true) => {
+  const newContent = isGemini
+    ? { parts: [{ text: content }] }
+    : { content: content };
 
+  let msgs = cache.get("messages" + number) ?? [];
 
+  const messages = [
+    ...msgs,
+    {
+      role,
+      ...newContent,
+    },
+  ];
 
-module.exports = { getMediaMessage };
+  cache.set("messages" + number, messages, 1800);
+
+  return messages;
+};
+
+module.exports = { getMediaMessage, manageMessagesCache };

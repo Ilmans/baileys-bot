@@ -1,3 +1,4 @@
+const GeminiAi = require("../external/geminiAi");
 const StickerWa = require("../external/stickerWa");
 const ResponFormatter = require("../lib/responFormatter");
 const SenderManager = require("./senderManager");
@@ -43,6 +44,12 @@ class MessageHandler {
     }
 
     //handle ai
+    try {
+      const response = await GeminiAi.run(from, text);
+      return this.responFormatter.line(response).responAsText();
+    } catch (error) {
+      console.log("something went wrong in gemini ai", error);
+    }
   }
 }
 
