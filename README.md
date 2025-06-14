@@ -1,57 +1,60 @@
-# WhatsApp AI Bot with Gemini AI & OpenAI
+🤖 Bot de WhatsApp com IA Gemini e OpenAI
+Bem-vindo ao projeto Bot de WhatsApp com IA!
+Este bot utiliza o poder da IA Gemini e da OpenAI para trazer respostas inteligentes diretamente para suas conversas no WhatsApp.
+Seja para criar figurinhas ou conversar com uma IA, este bot está pronto para te atender!
 
-Welcome to the WhatsApp AI Bot project! This bot leverages the power of Gemini AI and OpenAI to bring smart, responsive AI capabilities directly to your WhatsApp chats. Whether you want to create stickers or have a conversation with AI, this bot has got you covered!
+Este projeto foi desenvolvido com as seguintes ferramentas para WhatsApp:
 
-This project is built using the following whatsapp tools:
+WhatsApp Core: @WhiskeySockets/baileys
 
-- **WhatsApp Core**: [@WhiskeySockets/baileys](https://github.com/WhiskeySockets/Baileys)
+⚙️ Funcionalidades
+Chat com IA: Converse de forma inteligente com suporte da IA Gemini ou OpenAI.
 
-## Features
+Criação de Figurinhas: Converta imagens facilmente em figurinhas do WhatsApp.
 
-- **AI Chat**: Engage in intelligent conversations powered by Gemini AI or OpenAI.
-- **Sticker Creation**: Easily convert images into WhatsApp stickers.
+🚀 Instalação
+Siga os passos abaixo para começar:
 
-## Installation
+Clone o repositório:
 
-To get started, follow these steps:
+bash
+Copiar
+Editar
+git clone https://github.com/Ilmans/baileys-bot.git
+cd baileys-bot
+Renomeie e configure o arquivo .env:
 
-1. **Clone the repository**:
+Renomeie o arquivo .env.example para .env.
 
-   ```bash
-   git clone https://github.com/Ilmans/baileys-bot.git
-   cd baileys-bot
-   ```
+Preencha com sua chave da Gemini (gemini_key) ou da OpenAI (openai_key).
 
-2. **Rename and configure `.env` file**:
+Defina a variável bot_active como gemini ou openai, conforme o serviço de IA desejado.
 
-   - Rename `.env.example` to `.env`.
-   - Fill in your `gemini_key` or `openai_key`.
-   - Set `bot_active` to either `gemini` or `openai` based on the AI service you want to use.
+Instale as dependências e inicie o bot:
 
-3. **Install dependencies and start the bot**:
+bash
+Copiar
+Editar
+npm install
+npm run start
+Escaneie o QR Code:
 
-   ```bash
-   npm install
-   npm run start
-   ```
+Após iniciar o bot, um QR code aparecerá no seu terminal.
 
-4. **Scan QR Code**:
-   - After running the start command, a QR code will appear in your terminal.
-   - Scan the QR code using your WhatsApp application to connect.
+Escaneie esse QR com o seu aplicativo WhatsApp para conectar.
 
-## Commands
+💬 Comandos
+Após conectar o bot, use os seguintes comandos:
 
-Once the bot is connected, you can use the following commands:
+/start: Inicia o bot e ativa os recursos de IA.
 
-1. **/start**: Start the bot and activate AI features.
-2. **/stiker**: Convert an image into a WhatsApp sticker (send the `/stiker` command followed by an image).
-3. **/stop**: Stop the bot and deactivate AI features.
-4. **AI Responses**: Any message that isn't a command will be handled by the AI (if the bot is started).
+/stiker: Converte uma imagem em figurinha do WhatsApp (envie o comando /stiker seguido de uma imagem).
 
-## License
+/stop: Para o bot e desativa os recursos de IA.
 
-This project is licensed under the MIT License.
+Respostas com IA: Qualquer mensagem que não seja um comando será respondida pela IA (caso o bot esteja ativo).
 
----
+📄 Licença
+Este projeto está licenciado sob a Licença MIT.
 
-Happy chatting with your new WhatsApp AI bot! 🎉
+✨ Aproveite para conversar com seu novo bot de WhatsApp com IA! 🎉
